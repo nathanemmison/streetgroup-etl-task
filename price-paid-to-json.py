@@ -26,15 +26,16 @@ def getPricePaidFile(url):
 	with open('price-paid-data.csv', 'wb') as file:
 		file.write(r.content)
 
-def cleanUp():
+def cleanUp(file):
 
-	logger.info('Cleaning up file price-paid-data.csv')
+	logger.info('Cleaning up file %s', file)
 
 	# Ensure file exists before removing
-	if os.path.isfile('price-paid-data.csv'):
-		os.remove('price-paid-data.csv')
+	if os.path.isfile(file):
+		os.remove(file)
+		logger.info('File %s has been removed', file)
 	else:
-		logger.error('File price-paid-data.csv not found.')
+		logger.error('File %s not found.', file)
 		exit(1)
 
 ## Start of Code ##
@@ -42,5 +43,8 @@ def cleanUp():
 # Retrieve File from Source
 getPricePaidFile('http://prod.publicdata.landregistry.gov.uk.s3-website-eu-west-1.amazonaws.com/pp-monthly-update-new-version.csv')
 
+# Read CSV into Beam
+readCsv('price-paid-data.csv')
+
 # Clean Up
-cleanUp()
+cleanUp('price-paid-data.csv')
