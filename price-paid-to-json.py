@@ -4,6 +4,9 @@
 import requests
 import os
 import logging
+import apache_beam as beam
+import json
+import csv
 
 # Setting up logger format
 logging.basicConfig(format='%(asctime)s\t%(levelname)s\t%(message)s', datefmt='%d-%b-%y %H:%M:%S')
@@ -37,6 +40,29 @@ def cleanUp(file):
 	else:
 		logger.error('File %s not found.', file)
 		exit(1)
+
+def parse_row(element):
+	for line in csv.reader([element], quotechar='"', delimiter=',', quoting=csv.QUOTE_ALL):
+		return line
+
+def readCsv(input):
+
+	logger.info('Starting pipeline')
+
+	headers = ['transactionUniqueIndentifier', 'Price', 'dateOfTransfer', 'Postcode', 'propertyType', 'oldOrNew', 'Duration', 'PAON', 'SAON', 'Street', 'Locality', 'townCity', 'District', 'County', 'PPDType', 'recordStatus']
+
+	try:
+		with beam.Pipeline() as p:
+			parsed_csv = (	p
+			           		| 'Read input file' >> beam.io.ReadFromText(input) # Read the CSV file
+			           		| 'Parse file' >> beam.Map(parse_row) # Parse each row in the CSV format
+			           		| 'Print output' >> beam.io.WriteToText(file_path_prefix='price-paid-data', file_name_suffix='.json') # Write Output
+			             )
+	except Exception as e:
+		logger.error('Pipeline encountered error', exc_info=True)
+		exit(1)
+
+	logger.info('End of pipeline')
 
 ## Start of Code ##
 
