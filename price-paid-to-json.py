@@ -60,6 +60,14 @@ def convertListToJson(element):
 
 	return json.dumps(line)
 
+def convertPriceToInt(element):
+
+	line = json.loads(element)
+
+	line['price'] = int(line['price'])
+
+	return json.dumps(line)
+
 def runPipeline(input, output):
 
 	logger.info('Starting pipeline')
@@ -71,6 +79,7 @@ def runPipeline(input, output):
 							| 'Read input file' >> beam.io.ReadFromText(input) # Read the CSV file
 							| 'Parse file' >> beam.Map(convertListToCsv) # Parse each row in the CSV format
 							| 'Convert to JSON' >> beam.Map(convertListToJson) # Parse each row into JSON
+							| 'Convert Price to Integer' >> beam.Map(convertPriceToInt) # Parse each row into JSON
 							| 'Print output' >> beam.io.WriteToText(file_path_prefix=output, file_name_suffix='.json') # Write Output
 			             )
 	except Exception as e:
