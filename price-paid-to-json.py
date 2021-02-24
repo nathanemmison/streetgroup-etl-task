@@ -41,22 +41,37 @@ def cleanUp(file):
 		logger.error('File %s not found.', file)
 		exit(1)
 
-def parse_row(element):
+def convertListToCsv(element):
+	# Create a list version of the CSV, using the Python package allows for better parsiing e.g quotes, escaping commas in addresses etc.
 	for line in csv.reader([element], quotechar='"', delimiter=',', quoting=csv.QUOTE_ALL):
 		return line
 
-def readCsv(input):
+def convertListToJson(element):
+
+	# List of Headers
+	headers = ["transactionUniqueIndentifier", "price", "dateOfTransfer", "postcode", "propertyType", "oldOrNew", "duration", "PAON", "SAON", "street", "locality", "townCity", "district", "county", "PPDType", "recordStatus"]
+
+	# Create blank dictionary
+	line = {}
+
+	# Loop through row and header to create the dictionary
+	for index, value in enumerate(element):
+		line[headers[index]] = (element[index])
+
+	return json.dumps(line)
+
+def runPipeline(input, output):
 
 	logger.info('Starting pipeline')
 
-	headers = ['transactionUniqueIndentifier', 'Price', 'dateOfTransfer', 'Postcode', 'propertyType', 'oldOrNew', 'Duration', 'PAON', 'SAON', 'Street', 'Locality', 'townCity', 'District', 'County', 'PPDType', 'recordStatus']
-
+	# Start of Pipeline
 	try:
 		with beam.Pipeline() as p:
 			parsed_csv = (	p
-			           		| 'Read input file' >> beam.io.ReadFromText(input) # Read the CSV file
-			           		| 'Parse file' >> beam.Map(parse_row) # Parse each row in the CSV format
-			           		| 'Print output' >> beam.io.WriteToText(file_path_prefix='price-paid-data', file_name_suffix='.json') # Write Output
+							| 'Read input file' >> beam.io.ReadFromText(input) # Read the CSV file
+							| 'Parse file' >> beam.Map(convertListToCsv) # Parse each row in the CSV format
+							| 'Convert to JSON' >> beam.Map(convertListToJson) # Parse each row into JSON
+							| 'Print output' >> beam.io.WriteToText(file_path_prefix=output, file_name_suffix='.json') # Write Output
 			             )
 	except Exception as e:
 		logger.error('Pipeline encountered error', exc_info=True)
@@ -69,8 +84,8 @@ def readCsv(input):
 # Retrieve File from Source
 getPricePaidFile('http://prod.publicdata.landregistry.gov.uk.s3-website-eu-west-1.amazonaws.com/pp-monthly-update-new-version.csv')
 
-# Read CSV into Beam
-readCsv('price-paid-data.csv')
+# Run Beam Pipeline
+runPipeline('price-paid-data.csv', 'price-paid-data')
 
 # Clean Up
 cleanUp('price-paid-data.csv')
