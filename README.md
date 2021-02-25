@@ -1,10 +1,10 @@
 # Street Group Pipeline Task
 
-I have completed the pipeline to the point where it generates the JSON file. If I had more time I would continue to develop the pipeline and complete the requirment for the grouping. This is my first time using Apache Beam but I think it went well.
+I have completed the pipeline to the point where it generates the JSON file. If I had more time I would continue to develop the pipeline and complete the requirement for the grouping. This is my first time using Apache Beam but I think it went well.
 
 ## Design
 
-I decided to complete my pipeline in a procedural fashion as I thought this would be simplest for the is task. My code uses functions as a way to split out the code to make it easier to read and manage.
+I decided to complete my pipeline in a procedural fashion as I thought this would be simplest for this task. My code uses functions as a way to split out the code to make it easier to read and manage.
 
 I have included logging and exception handling to catch any problems with the process.
 
@@ -30,13 +30,13 @@ As a small thing to improve accuracy, I wanted to convert the price field into a
 
 ### File Output
 
-I used the built in Beam file writer for this, giving it a .json suffix.
+I used the built-in Beam file writer for this, giving it a .json suffix.
 
 ## Improvements and Retrospective
 
 If I was to do this task again, I think I would focus less on the details like logging and exceptions and focus more on the core requirments to get it finished.
 
-If I had longer, I would also like to learn more about Apache Beam and try to improve the way I interact with the framework. Most of my pipeline runs custom made functions rather than any built in.
+If I had longer, I would also like to learn more about Apache Beam and try to improve the way I interact with the framework. Most of my pipeline runs custom made functions rather than any built-in.
 
 I would also like to add testing into the code for example, making sure a valid JSON format is returned.
 
